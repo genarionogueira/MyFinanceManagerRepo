@@ -74,6 +74,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AmexFileReader.cs" />
+    <Compile Include="Conta.cs" />
+    <Compile Include="Contas.cs" />
     <Compile Include="ItauFileReader.cs" />
     <Compile Include="TransactionsManager.cs" />
     <Compile Include="NuBankFileReader.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
+    <Compile Include="XMLTransactionsFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
