@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AmexFileReader.cs" />
+    <Compile Include="ItauFileReader.cs" />
     <Compile Include="TransactionsManager.cs" />
     <Compile Include="NuBankFileReader.cs" />
     <Compile Include="Program.cs" />

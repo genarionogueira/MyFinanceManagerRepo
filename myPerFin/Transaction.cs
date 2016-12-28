@@ -21,26 +21,45 @@ namespace myPerFin
         public DateTime my_dateLancamento { get; set; }
         public DateTime my_dateCompra { get; set; }
 
+        private string p_my_key;
+
+        public string my_key
+        {
+            get { return my_contaCredito + 
+                         my_usuario + 
+                         my_valor+ 
+                         my_descricao; }
+            
+        }
+
+
+
+
         public Transaction()
         {
 
         }
-        public Transaction(DateTime date, string title, double value, string user, string currency)
+        public Transaction(DateTime date, 
+                           string title, 
+                           double value, 
+                           string user, 
+                           string currency)
         {
             this.my_dateLancamento = date;
             this.my_descricao = title.ToUpper();
             this.my_valor = value;
             this.my_usuario = user.ToUpper();
-            this.my_currency = currency.ToUpper();
-            print_me();
+            this.my_currency = currency.ToUpper();            
         }
-        
+
         public void print_me()
         {
             Console.WriteLine(this.my_usuario);
             Console.WriteLine (this.my_dateLancamento);
             Console.WriteLine (this.my_descricao);
-            Console.WriteLine (this.my_currency + " " + this.my_valor);            
+            Console.WriteLine (this.my_currency + " " + this.my_valor);
+            Console.WriteLine("DEB:"+this.my_contaCredito);
+            Console.WriteLine("CRED:"+this.my_contaDebito);
             Console.WriteLine("****************************************");
 
         }

@@ -13,10 +13,15 @@ namespace myPerFin
 {
     class TransactionsManager
     {
-        List<Transaction> allTrans = new List<Transaction>();
+        Dictionary<string,Transaction> allTrans = new Dictionary<string, Transaction>();        
         AmexFileReader amex;
-        NuBankFileReader nubank;      
-
+        NuBankFileReader nubank;
+        ItauFileReader itauReader;
+        public void read_itauFile(string path, string user)
+        {
+            itauReader = new ItauFileReader(path, user);
+            add_transactions(itauReader.alltransactions);
+        }
         public void read_NuBank(string path, string user)
         {
             nubank = new NuBankFileReader(path, user);
@@ -27,12 +32,20 @@ namespace myPerFin
             amex = new AmexFileReader(path);
             add_transactions(amex.allTransactions);
         }
-
         private void add_transactions(List<Transaction> transList)
         {
             foreach(Transaction onetrans in transList)
             {
-                allTrans.Add(onetrans);
+                if (!allTrans.ContainsKey(onetrans.my_key))
+                {
+                    allTrans.Add(onetrans.my_key, onetrans);
+                }
+                else
+                {
+                    Console.WriteLine("**Transaction already loaded**");
+                    onetrans.print_me();
+                }
+                
             }
         }
 

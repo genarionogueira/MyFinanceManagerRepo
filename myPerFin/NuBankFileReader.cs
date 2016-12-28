@@ -28,6 +28,8 @@ namespace myPerFin
                                                  Convert.ToDouble(line[2]), 
                                                  user,"R$");
 
+                oneTransaction.my_contaCredito = "NUBANK";
+                oneTransaction.print_me();
                 allTransactions.Add(oneTransaction);
             }            
         }
