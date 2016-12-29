@@ -51,6 +51,7 @@ namespace myPerFin
                 if (!transRepository.ContainsKey(onetrans.my_key))
                 {
                     transRepository.Add(onetrans.my_key,onetrans);
+                    xmlFile.add_one_transaction(onetrans);
                 }
                 else
                 {

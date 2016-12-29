@@ -15,34 +15,12 @@ namespace myPerFin
         XmlElement controleFinanceiro;
         XmlElement transactionsNode;        
         XmlElement accountsNode;
-        String myXmlPath;
-
-        
-        public void create_basic_structure()
-        {
-            //create xml structure                     
-            doc = new XmlDocument();
-            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-            XmlElement root = doc.DocumentElement;
-            doc.InsertBefore(xmlDeclaration, root);            
-
-            controleFinanceiro = create_element("controle_financeiro");
-            doc.AppendChild(controleFinanceiro);
-
-            transactionsNode = create_element("transactions");
-            controleFinanceiro.AppendChild(transactionsNode);
-
-            accountsNode = create_element("accounts");            
-            controleFinanceiro.AppendChild(accountsNode);
-
-        }
-
+        String myXmlPath;        
+        //contructors
         public XmlElement create_element( string elementName)
         {
             return doc.CreateElement(string.Empty, elementName, string.Empty);
         }
-
-
         public XMLTransactionsFile(string filePath)
         {
             doc = new XmlDocument();
@@ -67,29 +45,40 @@ namespace myPerFin
                 create_basic_structure();
             }            
         }
+        //create basic structure of the xml
+        public void create_basic_structure()
+        {
+            doc = new XmlDocument();
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement root = doc.DocumentElement;
+            doc.InsertBefore(xmlDeclaration, root);
 
+            controleFinanceiro = create_element("controle_financeiro");
+            doc.AppendChild(controleFinanceiro);
+
+            transactionsNode = create_element("transactions");
+            controleFinanceiro.AppendChild(transactionsNode);
+
+            accountsNode = create_element("accounts");
+            controleFinanceiro.AppendChild(accountsNode);
+
+        }
+
+        //save the xml
         public void save_xml_file()
         {
             doc.Save(this.myXmlPath);
         }
-        public void save_xml_file(string path)
-        {
-            doc.Save(path);
-        }
+
+        //get all transactions as object
         public List<Transaction> get_transaction_list()
         {
             List<Transaction> allTrans = new List<Transaction>();
             try
             {
-                foreach (XmlNode transNode in transactionsNode.ChildNodes)
+                foreach(XmlNode transNode in transactionsNode.ChildNodes)
                 {
-                    Transaction trans = new Transaction();
-                    foreach (XmlNode transProp in transNode.ChildNodes)
-                    {
-                        System.Reflection.PropertyInfo propInfo = trans.GetType().GetProperty(transProp.Name);
-                        insert_xmlNode_Into_Property(propInfo, transProp, trans);                   
-                    }
-                    allTrans.Add(trans);
+                    allTrans.Add((Transaction)parse_XmlNode_to_object(transNode));
                 }
                 return allTrans;
             }
@@ -100,44 +89,59 @@ namespace myPerFin
                 throw e;
             }
         }    
-        
-        private void insert_xmlNode_Into_Property(System.Reflection.PropertyInfo propInfo,XmlNode transProp, Transaction trans)
+                    
+        //parse a xmlNode to a Object
+        private object parse_XmlNode_to_object(XmlNode myNode)
         {
-            if (propInfo.CanWrite)
+            Object obj = GetInstance(myNode.Name);
+            foreach (XmlNode propertyNode in myNode.ChildNodes)
             {
-                if (propInfo.PropertyType.Name == "String")
+                System.Reflection.PropertyInfo prop;
+                prop = obj.GetType().GetProperty(propertyNode.Name);
+                prop.SetValue(obj, Convert.ChangeType(propertyNode.InnerText,Type.GetType(prop.GetType().FullName)), null);
+            }
+            return obj;
+        }
+        //get a instace of a object by his name
+        private object GetInstance(string strFullyQualifiedName)
+        {
+            Type t = Type.GetType(strFullyQualifiedName);
+            return Activator.CreateInstance(t);
+        }
+        //parse a object to a XmlNode
+        private XmlElement parse_obj_to_XmlNode(object myObj, XmlNode parentNode = null)
+        {
+            XmlElement objNode = create_element(myObj.GetType().Name);
+            if (parentNode != null)
+            {
+                parentNode.AppendChild(objNode);
+            }
+
+            foreach (System.Reflection.PropertyInfo propinfo in myObj.GetType().GetProperties())
+            {
+                XmlElement nodeProp = create_element(propinfo.Name);
+                if (propinfo.PropertyType.IsClass)
                 {
-                    propInfo.SetValue(trans, transProp.InnerText, null);
-                }
-                else if (propInfo.PropertyType.Name == "Double")
-                {
-                    propInfo.SetValue(trans, Convert.ToDouble(transProp.InnerText), null);
-                }
-                else if (propInfo.PropertyType.Name == "DateTime")
-                {
-                    propInfo.SetValue(trans, Convert.ToDateTime(transProp.InnerText), null);
+                    this.parse_obj_to_XmlNode(propinfo.GetValue(myObj, null), objNode);
                 }
                 else
                 {
-                    Console.WriteLine(propInfo.PropertyType.Name);
+                    nodeProp.InnerText = Convert.ToString(propinfo.GetValue(myObj, null));
                 }
+                
             }
-        } 
+            return objNode;
+
+        }
+
+
 
         public void add_one_transaction(Transaction trans)
         {
             try
             {
-                XmlNode transactions = doc.SelectSingleNode("controle_financeiro/transactions");
-                XmlElement oneTransaction = create_element("transaction");
-                transactions.AppendChild(oneTransaction);
-                foreach (System.Reflection.PropertyInfo property in trans.GetType().GetProperties())
-                {
-                    XmlElement oneProperty = create_element(property.Name);
-                    oneProperty.InnerText = Convert.ToString(property.GetValue(trans, null));
-                    oneTransaction.AppendChild(oneProperty);
-                }
-
+                XmlNode transNode = parse_obj_to_XmlNode(trans);
+              
             }
             catch (Exception e)
             {

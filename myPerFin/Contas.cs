@@ -11,16 +11,18 @@ namespace myPerFin
     {
         Dictionary<string, Conta> allContasByName = new Dictionary<string, Conta>();
         
-        public void add_conta_by_name(string name, string description = "")
+        public void add_conta(Conta conta)
         {
-            Conta conta = new Conta();
-            conta.my_Name = name;
-            conta.my_Description = description;            
-            if (!allContasByName.ContainsValue(conta))
+            if (!allContasByName.ContainsKey(conta.my_Name))
             {
                 this.allContasByName.Add(conta.my_Name, conta);
             }                                      
         }
+        public Conta get_conta_by_name(string name)
+        {
+            return allContasByName[name];
+        }
+
 
         public void remove_conta_by_name(string name)
         {

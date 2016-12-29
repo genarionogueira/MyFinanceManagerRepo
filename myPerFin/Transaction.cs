@@ -10,8 +10,10 @@ namespace myPerFin
 {
     class Transaction
     {
-        public string my_contaDebito { get; set; }
-        public string my_contaCredito { get; set; }
+        //properties
+        public Conta my_contaDebito { get; set; }
+
+        public Conta my_contaCredito { get; set; }
         public double my_valor { get; set; }
         public string my_descricao { get; set; }
         public string my_geo_local { get; set; }
@@ -20,8 +22,6 @@ namespace myPerFin
         public string my_currency { get; set; }
         public DateTime my_dateLancamento { get; set; }
         public DateTime my_dateCompra { get; set; }
-
-        private string p_my_key;
 
         public string my_key
         {
@@ -40,7 +40,7 @@ namespace myPerFin
         }
 
 
-
+        //contructors
 
         public Transaction()
         {
@@ -58,7 +58,7 @@ namespace myPerFin
             this.my_usuario = user.ToUpper();
             this.my_currency = currency.ToUpper();            
         }
-
+        //functions
         public void print_me()
         {
             Console.WriteLine(this.my_usuario);

@@ -28,7 +28,7 @@ namespace myPerFin
                                                  Convert.ToDouble(line[2]), 
                                                  user,"R$");
 
-                oneTransaction.my_contaCredito = "NUBANK";
+                oneTransaction.my_contaCredito = new Conta("NUBANK","Cartao de Credito NuBank");
                 //oneTransaction.print_me();
                 allTransactions.Add(oneTransaction);
             }            

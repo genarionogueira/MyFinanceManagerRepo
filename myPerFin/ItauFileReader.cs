@@ -24,7 +24,7 @@ namespace myPerFin
                                             oneLine[1], 
                                             Convert.ToDouble(oneLine[2].Replace(',','.')),
                                             user, "R$");
-                oneTrans.my_contaCredito = "CC ITAU";
+                oneTrans.my_contaCredito = new Conta("CC ITAU","Conta corrente do Itau");
                 //oneTrans.print_me();
                 alltransactions.Add(oneTrans);
             }

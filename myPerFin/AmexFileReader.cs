@@ -76,7 +76,7 @@ namespace myPerFin
                     myTrans.my_valor = Convert.ToDouble(tr.SelectNodes("td")[2].SelectNodes("span")[1].InnerText.Replace(',', '.'));
 
                 }
-                myTrans.my_contaCredito = "AMEX";
+                myTrans.my_contaCredito = new Conta("AMEX","Cartao de Credito Amex");
                 //myTrans.print_me();
 
         
