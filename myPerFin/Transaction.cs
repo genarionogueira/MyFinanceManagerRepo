@@ -25,11 +25,18 @@ namespace myPerFin
 
         public string my_key
         {
-            get { return my_contaCredito + 
-                         my_usuario + 
-                         my_valor+ 
-                         my_descricao; }
-            
+            get
+            {
+                string myKey = "";
+                foreach(System.Reflection.PropertyInfo propInfo in this.GetType().GetProperties())
+                {
+                    if (propInfo.CanWrite)
+                    {
+                        myKey = myKey + Convert.ToString(propInfo.GetValue(this));
+                    }
+                }
+                return myKey;
+            }            
         }
 
 

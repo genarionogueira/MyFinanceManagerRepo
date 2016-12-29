@@ -77,7 +77,7 @@ namespace myPerFin
 
                 }
                 myTrans.my_contaCredito = "AMEX";
-                myTrans.print_me();
+                //myTrans.print_me();
 
         
 

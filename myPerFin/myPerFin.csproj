@@ -52,6 +52,10 @@
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.10.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.10\lib\itextsharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OFXSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OFXSharp.1.0.4002\lib\net35\OFXSharp.dll</HintPath>
       <Private>True</Private>
@@ -77,6 +81,7 @@
     <Compile Include="Conta.cs" />
     <Compile Include="Contas.cs" />
     <Compile Include="ItauFileReader.cs" />
+    <Compile Include="PDFFileReader.cs" />
     <Compile Include="TransactionsManager.cs" />
     <Compile Include="NuBankFileReader.cs" />
     <Compile Include="Program.cs" />

@@ -29,7 +29,7 @@ namespace myPerFin
                                                  user,"R$");
 
                 oneTransaction.my_contaCredito = "NUBANK";
-                oneTransaction.print_me();
+                //oneTransaction.print_me();
                 allTransactions.Add(oneTransaction);
             }            
         }

@@ -13,7 +13,7 @@ namespace myPerFin
 {
     class TransactionsManager
     {
-        public Dictionary<string,Transaction> allTrans = new Dictionary<string, Transaction>();        
+        public Dictionary<string,Transaction> transRepository = new Dictionary<string, Transaction>();        
         private AmexFileReader amex;
         private NuBankFileReader nubank;
         private ItauFileReader itauReader;
@@ -47,10 +47,10 @@ namespace myPerFin
         {
             foreach(Transaction onetrans in transList)
             {
-                if (!allTrans.ContainsKey(onetrans.my_key))
+
+                if (!transRepository.ContainsKey(onetrans.my_key))
                 {
-                    allTrans.Add(onetrans.my_key, onetrans);
-                    xmlFile.add_one_transaction(onetrans);
+                    transRepository.Add(onetrans.my_key,onetrans);
                 }
                 else
                 {
