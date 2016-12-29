@@ -6,42 +6,55 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
+
 namespace myPerFin
 {
     class XMLTransactionsFile
     {
-        XmlDocument doc = new XmlDocument();
+        XmlDocument doc;
         XmlElement controleFinanceiro;
         XmlElement transactionsNode;        
         XmlElement accountsNode;
+        String myXmlPath;
 
-        public List<Transaction> transactionsList { get; set; }
-
-
+        
         public void create_basic_structure()
         {
-            //create main structure
-            controleFinanceiro = doc.CreateElement("controle_financeiro");
+            //create xml structure                     
+            doc = new XmlDocument();
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement root = doc.DocumentElement;
+            doc.InsertBefore(xmlDeclaration, root);            
+
+            controleFinanceiro = create_element("controle_financeiro");
             doc.AppendChild(controleFinanceiro);
-            transactionsNode = doc.CreateElement("transactions");
-            accountsNode = doc.CreateElement("accounts");
+
+            transactionsNode = create_element("transactions");
             controleFinanceiro.AppendChild(transactionsNode);
+
+            accountsNode = create_element("accounts");            
             controleFinanceiro.AppendChild(accountsNode);
+
         }
+
+        public XmlElement create_element( string elementName)
+        {
+            return doc.CreateElement(string.Empty, elementName, string.Empty);
+        }
+
+
         public XMLTransactionsFile(string filePath)
         {
-            this.transactionsList = new List<Transaction>();
+            doc = new XmlDocument();
+            this.myXmlPath = filePath;
             if (File.Exists(filePath))
             {
                 try
                 {
                     doc.Load(filePath);
                     transactionsNode = (XmlElement)doc.SelectSingleNode("controle_financeiro/transactions");
-                    accountsNode = (XmlElement)doc.SelectSingleNode("controle_financeiro/accounts");
-                    foreach (XmlNode transactionNode in transactionsNode.ChildNodes)
-                    {
-                        load_transactions_from_xml(transactionsNode);
-                    }
+                    accountsNode = (XmlElement)doc.SelectSingleNode("controle_financeiro/accounts");                                
+
                 }
                 catch (Exception e)
                 {
@@ -52,78 +65,85 @@ namespace myPerFin
             else
             {
                 create_basic_structure();
-            }
-            
+            }            
         }
 
+        public void save_xml_file()
+        {
+            doc.Save(this.myXmlPath);
+        }
         public void save_xml_file(string path)
         {
             doc.Save(path);
         }
-        public void load_transactions_from_xml(XmlNode transactionNode)
+        public List<Transaction> get_transaction_list()
         {
-            Transaction trans = new Transaction();
-            trans.my_contaDebito = transactionNode.SelectSingleNode("contaDebito").InnerText;
-            trans.my_contaCredito = transactionNode.SelectSingleNode("contaCredito").InnerText;
-            trans.my_valor = Convert.ToDouble( transactionNode.SelectSingleNode("valor").InnerText);
-            trans.my_descricao = transactionNode.SelectSingleNode("descricao").InnerText;
-            trans.my_geo_local = transactionNode.SelectSingleNode("geo_local").InnerText;
-            trans.my_outras_info= transactionNode.SelectSingleNode("outras_info").InnerText;
-            trans.my_usuario = transactionNode.SelectSingleNode("usuario").InnerText;
-            trans.my_currency = transactionNode.SelectSingleNode("currency").InnerText;
-            trans.my_dateLancamento = DateTime.Parse( transactionNode.SelectSingleNode("dateLancamento").InnerText);
-            trans.my_dateCompra = DateTime.Parse( transactionNode.SelectSingleNode("dateCompra").InnerText);
-            this.transactionsList.Add(trans);
-        }     
+            List<Transaction> allTrans = new List<Transaction>();
+            try
+            {
+                foreach (XmlNode transNode in transactionsNode.ChildNodes)
+                {
+                    Transaction trans = new Transaction();
+                    foreach (XmlNode transProp in transNode.ChildNodes)
+                    {
+                        System.Reflection.PropertyInfo propInfo = trans.GetType().GetProperty(transProp.Name);
+                        insert_xmlNode_Into_Property(propInfo, transProp, trans);                   
+                    }
+                    allTrans.Add(trans);
+                }
+                return allTrans;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+                Console.WriteLine(e.Message);
+                throw e;
+            }
+        }    
+        
+        private void insert_xmlNode_Into_Property(System.Reflection.PropertyInfo propInfo,XmlNode transProp, Transaction trans)
+        {
+            if (propInfo.CanWrite)
+            {
+                if (propInfo.PropertyType.Name == "String")
+                {
+                    propInfo.SetValue(trans, transProp.InnerText, null);
+                }
+                else if (propInfo.PropertyType.Name == "Double")
+                {
+                    propInfo.SetValue(trans, Convert.ToDouble(transProp.InnerText), null);
+                }
+                else if (propInfo.PropertyType.Name == "DateTime")
+                {
+                    propInfo.SetValue(trans, Convert.ToDateTime(transProp.InnerText), null);
+                }
+                else
+                {
+                    Console.WriteLine(propInfo.PropertyType.Name);
+                }
+            }
+        } 
 
         public void add_one_transaction(Transaction trans)
         {
+            try
+            {
+                XmlNode transactions = doc.SelectSingleNode("controle_financeiro/transactions");
+                XmlElement oneTransaction = create_element("transaction");
+                transactions.AppendChild(oneTransaction);
+                foreach (System.Reflection.PropertyInfo property in trans.GetType().GetProperties())
+                {
+                    XmlElement oneProperty = create_element(property.Name);
+                    oneProperty.InnerText = Convert.ToString(property.GetValue(trans, null));
+                    oneTransaction.AppendChild(oneProperty);
+                }
 
-            transactionsList.Add(trans);
-
-            XmlNode transactions = doc.SelectSingleNode("controle_financeiro/transactions");
-            XmlElement oneTransaction = doc.CreateElement("transaction");
-            transactions.AppendChild(oneTransaction);
-
-            XmlElement my_contaDebito_node = doc.CreateElement("contaDebito") ;
-            my_contaDebito_node.InnerText = trans.my_contaDebito;
-            oneTransaction.AppendChild(my_contaDebito_node);
-
-            XmlElement my_contaCredito = doc.CreateElement("contaCredito");
-            my_contaCredito.InnerText = trans.my_contaCredito;
-            oneTransaction.AppendChild(my_contaCredito);
-
-            XmlElement my_valor = doc.CreateElement("valor");
-            my_valor.InnerText = trans.my_valor.ToString();
-            oneTransaction.AppendChild(my_valor);
-
-            XmlElement my_descricao = doc.CreateElement("descricao");
-            my_descricao.InnerText = trans.my_descricao;
-            oneTransaction.AppendChild(my_descricao);
-
-            XmlElement my_geo_local = doc.CreateElement("geo_local");
-            my_geo_local.InnerText = trans.my_geo_local;
-            oneTransaction.AppendChild(my_geo_local);
-
-            XmlElement my_outras_info = doc.CreateElement("outras_info");
-            my_outras_info.InnerText = trans.my_outras_info;
-            oneTransaction.AppendChild(my_outras_info);
-
-            XmlElement my_usuario = doc.CreateElement("usuario");
-            my_usuario.InnerText = trans.my_usuario;
-            oneTransaction.AppendChild(my_usuario);
-
-            XmlElement my_currency = doc.CreateElement("currency");
-            my_currency.InnerText = trans.my_currency;
-            oneTransaction.AppendChild(my_currency);
-
-            XmlElement my_dateLancamento = doc.CreateElement("dateLancamento");
-            my_dateLancamento.InnerText = trans.my_dateLancamento.ToString();
-            oneTransaction.AppendChild(my_dateLancamento);
-
-            XmlElement my_dateCompra = doc.CreateElement("dateCompra");
-            my_dateCompra.InnerText = trans.my_dateCompra.ToString();
-            oneTransaction.AppendChild(my_dateCompra);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("error adding transaction, converting obj to xml");
+                Console.WriteLine(e.Message);
+            }
 
         }
     }

@@ -18,30 +18,31 @@ namespace myPerFin
         private NuBankFileReader nubank;
         private ItauFileReader itauReader;
         private XMLTransactionsFile xmlFile;
+        public TransactionsManager(string xmlPath )
+        {
+            xmlFile = new XMLTransactionsFile(xmlPath);
+            add_transactions(xmlFile.get_transaction_list());
+        }
+
         public void read_itauFile(string path, string user)
         {
             itauReader = new ItauFileReader(path, user);
             add_transactions(itauReader.alltransactions);
+            xmlFile.save_xml_file();
         }
         public void read_NuBank(string path, string user)
         {
             nubank = new NuBankFileReader(path, user);
             add_transactions(nubank.allTransactions);
+            xmlFile.save_xml_file();
         }
         public void read_americanExpress(string path)
         {
             amex = new AmexFileReader(path);
             add_transactions(amex.allTransactions);
+            xmlFile.save_xml_file();
         }
-        public void save_file(string xmlPath)
-        {
-            xmlFile = new XMLTransactionsFile(xmlPath);
-            foreach(Transaction trans in allTrans.Values)
-            {
-                xmlFile.add_one_transaction(trans);
-                xmlFile.save_xml_file(xmlPath);
-            }
-        }
+
         private void add_transactions(List<Transaction> transList)
         {
             foreach(Transaction onetrans in transList)
@@ -49,6 +50,7 @@ namespace myPerFin
                 if (!allTrans.ContainsKey(onetrans.my_key))
                 {
                     allTrans.Add(onetrans.my_key, onetrans);
+                    xmlFile.add_one_transaction(onetrans);
                 }
                 else
                 {

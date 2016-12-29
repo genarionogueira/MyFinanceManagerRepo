@@ -82,6 +82,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Transaction.cs" />
+    <Compile Include="XMLMaker.cs" />
     <Compile Include="XMLTransactionsFile.cs" />
   </ItemGroup>
   <ItemGroup>
