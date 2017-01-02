@@ -18,6 +18,7 @@ namespace myPerFin
             man.read_americanExpress("F:\\seguro\\fatura amex\\13122016.html");
             man.read_itauFile("F:\\seguro\\itau\\extrato.txt","genario nogueira");            
             PDFFileReader pdf = new PDFFileReader();
+            Console.WriteLine("Done!");
             Console.Read();
         }
 

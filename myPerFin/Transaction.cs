@@ -12,7 +12,6 @@ namespace myPerFin
     {
         //properties
         public Conta my_contaDebito { get; set; }
-
         public Conta my_contaCredito { get; set; }
         public double my_valor { get; set; }
         public string my_descricao { get; set; }
